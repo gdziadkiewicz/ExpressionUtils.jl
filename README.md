@@ -32,18 +32,19 @@ julia> b = quote
        end
 # => quote  # none, line 2:
 #        let x = 1, y = 2, z = 3 # line 3:
-#            +(x,y,z)
+#            x + y + z
 #        end
 #    end
 
-julia> isline(ex) = isa(ex, Expr) && ex.head == :line
-# methods for generic function isline
-isline(ex) at none:1
+julia> remove_line_nodes(node::LineNumberNode) = ExpressionUtils.Remove
+# remove_line_nodes (generic function with 1 method)
+julia> remove_line_nodes(ex) = ex
+# remove_line_nodes (generic function with 2 methods)
 
-julia> walk(ex -> isline(ex) ? ExpressionUtils.Remove : ex, b)
+julia> walk(remove_line_nodes, b)
 # => quote
 #        let x = 1, y = 2, z = 3
-#            +(x,y,z)
+#            x + y + z
 #        end
 #    end
 ```
@@ -54,7 +55,7 @@ Syntax rewriting!
 
 ```.jl
 julia> ex = quote
-           let x=1, y=2, z=3
+           let x, y, z
                bar
                x + y
                y + z
@@ -69,24 +70,21 @@ julia> template = quote
        end
 
 julia> out = quote
-           function _funname_(; _UNSPLAT_bindings_)
+           function _funname_( _UNSPLAT_bindings_)
                _UNSPLAT_body_
            end
        end
 
 julia> fnexpr = expr_replace(ex, template, out)
-# => :(function bar($(Expr(:parameters, :(x = 1), :(y = 2), :(z = 3))))
-#          +(x,y)
-#          +(y,z)
+# => :(function bar(x, y, z)
+#          x + y
+#          y + z
 #      end)
 
 julia> eval(fnexpr)
+# bar (generic function with 1 method)
 
-julia> bar()
-# methods for generic function bar
-bar()
-
-julia> bar()
+julia> bar(1, 2, 3)
 # => 5
 ```
 
