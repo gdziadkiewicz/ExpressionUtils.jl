@@ -33,10 +33,13 @@ remove_quote_block(val) = val
 remove_quote_block(ex::Expr) =
     ex.head == :block && length(ex.args) == 2 ? ex.args[2] : ex
 
-remove_line_ann(ex::Expr) =
-    walk((e) -> isa(e, Expr) && e.head == :line ? Remove : e, ex)
+function remove_line_ann(ex::Expr)
+    remove_line_nodes(node::LineNumberNode) = Remove
+    remove_line_nodes(e) = e
+    walk(remove_line_nodes, ex)
+end
 
-symbeginswith(sym, s) = beginswith(string(sym), s)
+symbeginswith(sym, s) = startswith(string(sym), s)
 issplat(sym)   = isa(sym, Symbol) && symbeginswith(sym, "_SPLAT_")
 isunsplat(sym) = isa(sym, Symbol) && symbeginswith(sym, "_UNSPLAT_")
 isesc(sym)     = isa(sym, Symbol) && symbeginswith(sym, "_ESC_")
@@ -81,11 +84,11 @@ expr_bindings(ex, template) =
 
 function unsplat(ex::Expr, bindings::Dict)
     r = (args, e) -> isunsplat(e) ?
-                     vcat(args, get(bindings, removeprefix(e), {e})) :
+                     vcat(args, get(bindings, removeprefix(e), [e])) :
                      push!(args, get(bindings, removeprefix(e), e))
 
     ex = copy(ex)
-    ex.args = reduce(r, {}, ex.args)
+    ex.args = reduce(r, [], ex.args)
     ex
 end
 
@@ -101,10 +104,9 @@ end
 
 function expr_replace(ex, template, out)
     ex, template, out = map((e) -> remove_line_ann(remove_quote_block(e)),
-                            {ex, template, out})
+                            [ex, template, out])
 
     bindings = expr_bindings(ex, template)
-
     expr_bind(remove_quote_block(out), bindings)
 end
 
