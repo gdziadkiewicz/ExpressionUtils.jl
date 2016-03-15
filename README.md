@@ -1,4 +1,8 @@
 ## Expression Utilities
+Windows: [![Build status](https://ci.appveyor.com/api/projects/status/c9hibcda8b728daa?svg=true)](https://ci.appveyor.com/project/gdziadkiewicz/expressionutils-jl)
+
+
+Linux, IOS: [![Build Status](https://travis-ci.org/gdziadkiewicz/ExpressionUtils.jl.svg?branch=master)](https://travis-ci.org/gdziadkiewicz/ExpressionUtils.jl)
 
 Useful functions for working with the Julia `Expr` type.
 
