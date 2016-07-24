@@ -46,11 +46,11 @@ end
 
 removeprefix(sym) =
     if issplat(sym)
-        symbol(string(sym)[7:end])
+        Symbol(string(sym)[7:end])
     elseif isunsplat(sym)
-        symbol(string(sym)[9:end])
+        Symbol(string(sym)[9:end])
     elseif isesc(sym)
-        symbol(string(sym)[5:end])
+        Symbol(string(sym)[5:end])
     else
         sym
     end

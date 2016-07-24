@@ -1,5 +1,7 @@
 module ExpressionUtils
 
+using Compat
+
 export is_funcdef_expr, get_funcdef_expr, funcdef_longform
 export walk, expr_replace, expr_bind, expr_bindings
 
