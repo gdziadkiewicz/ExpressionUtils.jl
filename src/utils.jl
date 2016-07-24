@@ -1,7 +1,3 @@
-module ExpressionUtils
-
-export walk, expr_replace, expr_bind, expr_bindings
-
 immutable Remove end
 
 # Recursively walk an Expr, applying a function to each subexpr and leaf to
@@ -109,5 +105,3 @@ function expr_replace(ex, template, out)
     bindings = expr_bindings(ex, template)
     expr_bind(remove_quote_block(out), bindings)
 end
-
-end # module ExpressionUtils

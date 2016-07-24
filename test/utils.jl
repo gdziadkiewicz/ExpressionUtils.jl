@@ -1,6 +1,3 @@
-using FactCheck
-using ExpressionUtils
-
 facts("Expression destructuring") do
 
     context("expr_bindings") do
