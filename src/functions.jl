@@ -120,3 +120,97 @@ function funcdef_longform(ex::Expr)
     end
     throw(ArgumentError(string("expected a function definition, got ", ex)))
 end
+
+"""
+    funcdef_name(sig)
+
+Return the function's Symbol given a signature expression `sig`. `sig`
+is the first argument of the function definition expression.
+"""
+function funcdef_name(sig::Expr)
+    sig.head == :call || throw(ArgumentError(string("expected call expression, got ", sig)))
+    decl = sig.args[1]
+    isa(decl, Symbol) && return decl::Symbol
+    if isa(decl, Expr) && (decl::Expr).head == :curly
+        return ((decl::Expr).args[1])::Symbol
+    end
+    throw(ArgumentError(string("unexpected call expression ", sig)))
+end
+
+"""
+    funcdef_params(sig)
+
+Return a Vector{Any} of the function's parameters (the part inside the
+curlies) given a signature expression `sig`. `sig` is the first
+argument of the function definition expression.
+
+The elements of the return may be Symbols or Exprs, where the latter
+is used for expressions like `T<:Integer`.
+"""
+function funcdef_params(sig::Expr)
+    sig.head == :call || throw(ArgumentError(string("expected call expression, got ", sig)))
+    ret = []
+    decl = sig.args[1]
+    isa(decl, Symbol) && return ret
+    if isa(decl, Expr) && (decl::Expr).head == :curly
+        for i = 2:length((decl::Expr).args)
+            push!(ret, (decl::Expr).args[i])
+        end
+        return ret
+    end
+    throw(ArgumentError(string("unexpected call expression ", sig)))
+end
+
+"""
+    funcdef_args(sig)
+
+Return a Vector{Any} of the function's argument expressions, which
+includes both the variable name and any type declaration, if any.
+
+The elements of the return may be Symbols or Exprs, where the latter
+is used for expressions like `x::Integer`.
+
+See also `funcdef_argnames` and `funcdef_argtypes`.
+"""
+function funcdef_args(sig::Expr)
+    sig.head == :call || throw(ArgumentError(string("expected call expression, got ", sig)))
+    return sig.args[2:end]
+end
+
+"""
+    funcdef_argnames(sig)
+
+Return a vector of the function's argument names.  These are typically
+Symbols, except for non-canonical syntax like that of Traitor.jl.
+
+See also `funcdef_args` and `funcdef_argtypeexprs`.
+"""
+function funcdef_argnames(sig::Expr)
+    sig.head == :call || throw(ArgumentError(string("expected call expression, got ", sig)))
+    return [argname(a) for a in sig.args[2:end]]
+end
+
+argname(s::Symbol) = s
+function argname(ex::Expr)
+    ex.head == :(::) || throw(ArgumentError("expected :(::) expression, got ", ex))
+    ex.args[1]
+end
+
+"""
+    funcdef_argtypeexprs(sig)
+
+Return a vector of the function's argument type expressions.  These
+may be Symbols (`:Int`) or expressions (`AbstractArray{T}`).
+
+See also `funcdef_args` and `funcdef_argnames`.
+"""
+function funcdef_argtypeexprs(sig::Expr)
+    sig.head == :call || throw(ArgumentError(string("expected call expression, got ", sig)))
+    return [argtypeexpr(a) for a in sig.args[2:end]]
+end
+
+argtypeexpr(s::Symbol) = :Any
+function argtypeexpr(ex::Expr)
+    ex.head == :(::) || throw(ArgumentError("expected :(::) expression, got ", ex))
+    ex.args[2]
+end
