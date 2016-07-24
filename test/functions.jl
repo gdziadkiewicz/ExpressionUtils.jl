@@ -56,7 +56,7 @@
                                                  (ex2, Symbol[], [:(x::Int)], [:x], [:Int]),
                                                  (ex3, [:T], [:(x::T)], [:x], [:T]),
                                                  (ex4, [:R,:S], [:(x::R), :(y::S), :z], [:x, :y, :z], [:R, :S, :Any]),
-                                                 (ex5, [:(T<:Integer)], [:(x::T), :(y::String)], [:x, :y], [:T, :String]),
+                                                 (ex5, [Expr(:(<:), :T, :Integer)], [:(x::T), :(y::String)], [:x, :y], [:T, :String]),
                                                  (ex6, [:T], [:(x::AbstractArray{T})], [:x], [:(AbstractArray{T})]))
             sig = ex.args[1]
             @test funcdef_name(sig) == :f
