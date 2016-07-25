@@ -6,6 +6,8 @@ Linux, IOS: [![Build Status](https://travis-ci.org/gdziadkiewicz/ExpressionUtils
 
 Useful functions for working with the Julia `Expr` type.
 
+### High level utilities
+
 #### `map(f::Function, e::Expr)`
 
 Constructs a new expression similar to `e`, but having had the function
@@ -91,3 +93,22 @@ julia> bar(1, 2, 3)
 Plays well with macros. See
 [ValueDispatch.jl](https://github.com/zachallaun/ValueDispatch.jl/blob/master/src/ValueDispatch.jl)
 for another example.
+
+### Low-level utilities
+
+#### Functions definition expressions
+
+This package contains a range of utilities for working with
+expressions that contain function definitions. Each of these has its
+own docstring that goes into detail, so here is just a summary:
+
+- `is_funcdef_expr` tests whether an expression is a function definition
+- `get_funcdef_expr` returns the "inner" function definition
+  expression, even if wrapped inside an `@inline` or `:block`
+  expression
+- `funcdef_longform` cannonicalizes function definition expressions
+- `funcdef_name` returns the function's name Symbol
+- `funcdef_params` returns the vector of parameters for a parametric function
+- `funcdef_args` returns the vector of arguments (names + type declarations)
+- `funcdef_argnames` returns the vector of argument names (Symbols)
+- `funcdef_argtypeexprs` returns the vector of argument type declarations
