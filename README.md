@@ -91,7 +91,7 @@ julia> bar(1, 2, 3)
 ```
 
 Plays well with macros. See
-[ValueDispatch.jl](https://github.com/zachallaun/ValueDispatch.jl/blob/master/src/ValueDispatch.jl)
+[ValueDispatch.jl](https://github.com/gdziadkiewicz/ValueDispatch.jl)
 for another example.
 
 ### Low-level utilities
