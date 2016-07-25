@@ -1,10 +1,10 @@
-facts("Expression destructuring") do
+@testset "Expression destructuring"  begin
 
-    context("expr_bindings") do
+    @testset "expr_bindings" begin
 
-        @fact expr_bindings(:(x = 5), :(x = _val_)) --> Dict(:_val_ => 5)
-        @fact expr_bindings(:(x = 5), :(_sym_ = 5)) --> Dict(:_sym_ => :x)
-        @fact expr_bindings(:(x = 5), :_ex_) --> Dict(:_ex_ => :(x = 5))
+        @test expr_bindings(:(x = 5), :(x = _val_)) == Dict(:_val_ => 5)
+        @test expr_bindings(:(x = 5), :(_sym_ = 5)) == Dict(:_sym_ => :x)
+        @test expr_bindings(:(x = 5), :_ex_) == Dict(:_ex_ => :(x = 5))
 
         splatex = Expr(:let, :_body_, :_SPLAT_bindings_)
         ex = :(let x=1, y=2, z=3
@@ -13,14 +13,16 @@ facts("Expression destructuring") do
                end)
 
         bindings = expr_bindings(ex, splatex)
+        body = bindings[:_body_]
+        b = bindings[:_bindings_]
 
-        @fact haskey(bindings, :_body_) --> true
-        @fact haskey(bindings, :_bindings_) --> true
-        @fact bindings[:_body_] --> body -> isa(body, Expr) && body.head == :block
-        @fact bindings[:_bindings_] --> b -> isa(b, Array) && length(b) == 3
+        @test haskey(bindings, :_body_)
+        @test haskey(bindings, :_bindings_)
+        @test isa(body, Expr) && body.head == :block
+        @test isa(b, Array) && length(b) == 3
     end
 
-    context("expr_replace") do
+    @testset "expr_replace"  begin
 
         ex = quote
             let x, y, z
@@ -45,9 +47,10 @@ facts("Expression destructuring") do
 
         foofun = expr_replace(ex, template, out)
         eval(foofun)
-        @fact foofun.head --> :function
-        @fact eval(foofun)(1,2,3) --> 5
-        @fact bar(1,2,3) --> 5
+
+        @test foofun.head == :function
+        @test eval(foofun)(1,2,3) == 5
+        @test bar(1,2,3) == 5
     end
 
 end
